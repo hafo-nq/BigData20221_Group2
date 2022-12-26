@@ -1,12 +1,7 @@
 # Bigdata Project
 
-## System diagram
-![System diagram](/images/system-diagram.png)
-
-## Data pipeline
-
-### Crawl & save raw data and transform & save into `Elasticsearch`
-![Crawl & save raw data and transform & save into Elasticsearch](/images/data-pipeline-1.png)
-
-### Transform into DataFrame and save into `HDFS` (parquet file)
-![Transform into DataFrame and save into `HDFS` (parquet file)](/images/data-pipeline-2.png)
+## Members
+- Nguyen Quoc Hao - 20194043
+- Nguyen Trong Bang - 20190038
+- Nguyen Ngoc Bao - 20193989
+- Vu Quang Truong - 20194198
