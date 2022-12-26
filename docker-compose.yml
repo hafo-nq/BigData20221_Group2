@@ -120,6 +120,5 @@ networks:
     driver: bridge
 
 
-# jupyter notebook --ip 0.0.0.0 --port=8888 --no-browser --allow-root --NotebookApp.allow_origin='https://colab.research.google.com' --NotebookApp.port_retries=0
 # /spark/bin/spark-submit /content/crawl.py --master spark://spark-master:7077 --deploy-mode cluster
 # /spark/bin/spark-submit /content/machine-learning.py --master spark://spark-master:7077 --deploy-mode cluster

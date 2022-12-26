@@ -14,7 +14,7 @@ def string_to_list(string):
     return [s.strip() for s in string.split(',')]
 
 def convert_year(year):
-    today = 2021
+    today = 2022
     if len(year) == 4:
         a = [year]
     elif len(year) == 5:
