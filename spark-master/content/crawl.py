@@ -131,7 +131,7 @@ if __name__ == '__main__':
             search_films_querystring = {
                 "s": sub_string,
                 "r": "json",
-                "page": str(j + 2)
+                "page": str(j + 3)
             }
             search_films_response = requests.request(
                 method="GET",
