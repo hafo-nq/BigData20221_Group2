@@ -1,5 +1,6 @@
 import requests
 import json
+from tqdm import tqdm
 from hdfs import InsecureClient
 from elasticsearch import Elasticsearch
 from pyspark.sql import SparkSession
@@ -115,23 +116,23 @@ if __name__ == '__main__':
         'x-rapidapi-key': "116b330202mshac573bc7e1c9d61p1618c7jsn8f077d38c0d6" # your secret key
     }
     CLIENT_HDFS = InsecureClient('http://namenode:9870', user='root')
-    RAW_DATA_DIRECTORY = '/user/root/test/'
-    ES = Elasticsearch('http://elasticsearch:9200')
-    INDEX = 'film'
-    CLIENT_HDFS.makedirs(RAW_DATA_DIRECTORY)
-    if not ES.indices.exists(index=INDEX):
-        ES.indices.create(index=INDEX)
-    MAX_PAGE_NUMBER = 1
+    RAW_DATA_DIRECTORY = '/user/root/rawdata/'
+    # ES = Elasticsearch('http://elasticsearch:9200')
+    # INDEX = 'film'
+    # CLIENT_HDFS.makedirs(RAW_DATA_DIRECTORY)
+    # if not ES.indices.exists(index=INDEX):
+    #     ES.indices.create(index=INDEX)
+    MAX_PAGE_NUMBER = 5
     with open('/content/keyword.txt', 'r') as f:
         SUB_STRING = [line[:-1] if line.endswith('\n') else line for line in f.readlines()]
     print(SUB_STRING)
     count = 0
     for i, sub_string in enumerate(SUB_STRING[:]):
-        for j in range(MAX_PAGE_NUMBER):
+        for j in tqdm(range(MAX_PAGE_NUMBER), desc="Crawling pages...",ncols=100):
             search_films_querystring = {
                 "s": sub_string,
                 "r": "json",
-                "page": str(j + 3)
+                "page": str(j + 6)
             }
             search_films_response = requests.request(
                 method="GET",
@@ -160,8 +161,8 @@ if __name__ == '__main__':
                         # if response successfully
                         if film_details_response.status_code == 200:
                             film_details_response_data = film_details_response.json()
-                            transform_result = es_transform(film_details_response_data)
-                            ES.index(index=INDEX, id=transform_result['imdbID'], document=transform_result)
+                            # transform_result = es_transform(film_details_response_data)
+                            # ES.index(index=INDEX, id=transform_result['imdbID'], document=transform_result)
                             # if response successfully
                             if film_details_response_data['Response'] == 'True':
                                 try:
@@ -170,22 +171,25 @@ if __name__ == '__main__':
                                         json.dump(film_details_response_data, writer)
                                     count += 1
                                 except Exception as e:
+                                    # print("hafoit eroor_______________________________________________________________________________________________________________________________________________")
                                     # print(e)
                                     pass
         print('%d/%d'%(i + 1, len(SUB_STRING)))
     print('Crawl %d films'%(count))
 
-    spark = SparkSession.builder.appName("Crawl And Transform").getOrCreate()
-    sc = spark.sparkContext
-    sqlContext = SQLContext(sc)
-    rdd = sc.wholeTextFiles('hdfs://namenode:9000' + RAW_DATA_DIRECTORY + '*.json')
-    PROCESSED_DATA_DIRECTORY = '/user/root/dataframe/'
-    CLIENT_HDFS.makedirs(PROCESSED_DATA_DIRECTORY)
+    # spark = SparkSession.builder.appName("Crawl And Transform").getOrCreate()
+    # sc = spark.sparkContext
+    # sqlContext = SQLContext(sc)
+    # rdd = sc.wholeTextFiles('hdfs://namenode:9000' + RAW_DATA_DIRECTORY + '*.json')
+    # PROCESSED_DATA_DIRECTORY = '/user/root/dataframe/'
+    # CLIENT_HDFS.makedirs(PROCESSED_DATA_DIRECTORY)
 
-    transform_rdd = rdd.values() \
-                    .map(lambda x: json.loads(x)) \
-                    .filter(lambda x: x['imdbRating'] != 'N/A') \
-                    .map(lambda x: hadoop_transform(x))
-    df = spark.createDataFrame(transform_rdd)
-    df.write.save('hdfs://namenode:9000' + PROCESSED_DATA_DIRECTORY, format='parquet', mode='append')
-    CLIENT_HDFS.delete(RAW_DATA_DIRECTORY, recursive=True)
+    # transform_rdd = rdd.values() \
+    #                 .map(lambda x: json.loads(x)) \
+    #                 .filter(lambda x: x['imdbRating'] != 'N/A') \
+    #                 .map(lambda x: hadoop_transform(x))
+    # df = spark.createDataFrame(transform_rdd)
+    # df.write.save('hdfs://namenode:9000' + PROCESSED_DATA_DIRECTORY, format='parquet', mode='append')
+    # CLIENT_HDFS.delete(RAW_DATA_DIRECTORY, recursive=True)
+    # sc.stop()
+    # spark.stop()

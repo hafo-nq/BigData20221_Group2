@@ -19,6 +19,7 @@ RUN apk add build-base \
       && pip3 install hdfs \
       && pip3 install elasticsearch \
       && pip3 install numpy \
+      && pip3 install tqdm \
       # && apk add openjdk11 \
       # && wget https://archive.apache.org/dist/hadoop/common/hadoop-3.2.2/hadoop-3.2.2.tar.gz \
       # && tar -xvzf hadoop-3.2.2.tar.gz \
